@@ -34,7 +34,7 @@ class GuessWord(object):
             raise InvalidGuessedLetterException()
         if letter in self.answer.lower():
             attempt = GuessAttempt(letter, hit=True)
-            self.masked = self.unveil_word(letter)
+            self.masked = self.unveil_word(self.answer, self.masked, letter)
         else:
             attempt = GuessAttempt(letter, miss=True)
         return attempt
@@ -66,15 +66,15 @@ class HangmanGame(object):
         
     
     def guess(self, letter):
-        if self.is_finished:
+        if self.is_finished():
             raise GameFinishedException()
         
         self.previous_guesses.append(letter.lower())
         
         attempt = self.word.perform_attempt(letter)
-        if attempt.is_miss:
+        if attempt.is_miss():
             self.remaining_misses -= 1
-            if self.is_lost:
+            if self.is_lost():
                 raise GameLostException()
         
         if self.is_won():
@@ -84,7 +84,7 @@ class HangmanGame(object):
         return attempt
     
     def is_finished(self):
-        if self.is_won or self.is_lost:
+        if self.is_won() or self.is_lost():
             return True
         return False
     
